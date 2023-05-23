@@ -66,14 +66,67 @@ STALEMATE = 0
 DEPTH = 3
 
 
-def findBestMove(game_state, valid_moves, return_queue):
+def findBestMove(game_state, valid_moves, return_queue, algorithm_option):
     global next_move
     next_move = None
     random.shuffle(valid_moves)
-    findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+    if(algorithm_option == 'Greedy'):
+        findMoveGreedy(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
                              1 if game_state.white_to_move else -1)
+    elif (algorithm_option == 'Minimax'):
+        findMoveMinimax(game_state, valid_moves, DEPTH, game_state.white_to_move, -CHECKMATE, CHECKMATE,)  
+    elif (algorithm_option == 'Negamax'):
+        findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+                             1 if game_state.white_to_move else -1)     
+    elif (algorithm_option == 'Negascout'):
+        findMoveNegascout(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+                             1 if game_state.white_to_move else -1) 
     return_queue.put(next_move)
 
+def findMoveGreedy(game_state, valid_moves, turn_multiplier):
+    for player_move in valid_moves:
+            game_state.makeMove(player_move)
+            score = turn_multiplier * scoreBoard(game_state)
+            game_state.undoMove()
+            if score > max_score:
+                max_score = score
+                best_move = player_move
+    return best_move
+
+def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
+    global next_move
+    if depth == 0:
+        return scoreBoard(game_state)
+    if white_to_move:
+        max_score = CHECKMATE
+        for move in valid_moves:
+            game_state.makeMove(move)
+            next_moves = game_state.getValidMoves()
+            score = findMoveMinimax(game_state, next_moves, depth - 1, False, alpha, beta)
+            game_state.undoMove()
+            if score > max_score:
+                max_score = score
+                if depth == DEPTH:
+                    next_move = move
+            alpha = max(alpha, max_score)
+            if alpha >= beta:
+                break
+        return max_score
+    else:
+        min_score = CHECKMATE
+        for move in valid_moves:
+            game_state.makeMove(move)
+            next_moves = game_state.getValidMoves()
+            score = findMoveMinimax(game_state, next_moves, depth - 1, True, alpha, beta)
+            game_state.undoMove()
+            if score < min_score:
+                min_score = score
+                if depth == DEPTH:
+                    next_move = move
+            beta = min(beta, min_score)
+            if alpha >= beta:
+                break
+        return min_score
 
 def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
     global next_move
@@ -95,6 +148,30 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
         if alpha >= beta:
             break
     return max_score
+
+def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+    global next_move
+    best_move = None
+    if depth == 0:
+        return turn_multiplier * scoreBoard(game_state)
+    for i, move in enumerate(valid_moves):
+        game_state.makeMove(move)
+        next_moves = game_state.getValidMoves()
+        if i == 0:
+            score = -findMoveNegascout(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
+        else:
+            score = -findMoveNegascout(game_state, next_moves, depth - 1, -alpha - 1, -alpha, -turn_multiplier)  # search with a null window
+            if alpha < score < beta:
+                score = -findMoveNegascout(game_state, next_moves, depth - 1, -beta, -score, -turn_multiplier)  # if it failed high, do a full re-search
+        game_state.undoMove()
+        if alpha < score:
+            best_move = move
+            alpha = score
+        if alpha >= beta:
+            break  # cut-off
+    if depth == DEPTH:
+        next_move = best_move
+    return alpha
 
 
 def scoreBoard(game_state):
