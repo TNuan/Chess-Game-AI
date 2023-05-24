@@ -4,9 +4,11 @@ Handling user input.
 Displaying current GameStatus object.
 """
 import pygame as p
-import ChessEngine, ChessAI
+import Engine.ChessEngine as ChessEngine, AI.ChessAI as ChessAI
 import sys
 from multiprocessing import Process, Queue
+import sys
+sys.setrecursionlimit(10000) 
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250
@@ -51,7 +53,7 @@ def main():
     move_log_font = p.font.SysFont("Arial", 14, False, False)
     player_one = False  # if a human is playing white, then this will be True, else False
     player_two = False  # if a hyman is playing white, then this will be True, else False
-    algorithm_option = 'Minimax' #choose the algorithm for AI to play 
+    algorithm_option = 'Greedy' #choose the algorithm for AI to play 
 
     while running:
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
