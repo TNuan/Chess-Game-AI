@@ -70,11 +70,14 @@ def scoreBoard(game_state):
             return CHECKMATE  # white wins
     elif game_state.stalemate:
         return STALEMATE
+    
+    pieces = []
     score = 0
     for row in range(len(game_state.board)):
         for col in range(len(game_state.board[row])):
             piece = game_state.board[row][col]
             if piece != "--":
+                pieces.append(piece)
                 piece_position_score = 0
                 if piece[1] != "K":
                     piece_position_score = piece_position_scores[piece][row][col]
@@ -82,5 +85,6 @@ def scoreBoard(game_state):
                     score += piece_score[piece[1]] + piece_position_score
                 if piece[0] == "b":
                     score -= piece_score[piece[1]] + piece_position_score
-
+    if len(pieces) == 2:
+        return STALEMATE
     return score
