@@ -1,8 +1,3 @@
-"""
-Handling the AI moves.
-"""
-import random
-
 piece_score = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
 
 knight_scores = [[0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0],
@@ -60,42 +55,9 @@ piece_position_scores = {"wN": knight_scores,
                          "bR": rook_scores[::-1],
                          "wp": pawn_scores,
                          "bp": pawn_scores[::-1]}
-
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
-
-
-def findBestMove(game_state, valid_moves, return_queue):
-    global next_move
-    next_move = None
-    random.shuffle(valid_moves)
-    findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
-                             1 if game_state.white_to_move else -1)
-    return_queue.put(next_move)
-
-
-def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
-    global next_move
-    if depth == 0:
-        return turn_multiplier * scoreBoard(game_state)
-    # move ordering - implement later //TODO
-    max_score = -CHECKMATE
-    for move in valid_moves:
-        game_state.makeMove(move)
-        next_moves = game_state.getValidMoves()
-        score = -findMoveNegaMaxAlphaBeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
-        if score > max_score:
-            max_score = score
-            if depth == DEPTH:
-                next_move = move
-        game_state.undoMove()
-        if max_score > alpha:
-            alpha = max_score
-        if alpha >= beta:
-            break
-    return max_score
-
+DEPTH = 2
 
 def scoreBoard(game_state):
     """
@@ -122,10 +84,3 @@ def scoreBoard(game_state):
                     score -= piece_score[piece[1]] + piece_position_score
 
     return score
-
-
-def findRandomMove(valid_moves):
-    """
-    Picks and returns a random valid move.
-    """
-    return random.choice(valid_moves)
