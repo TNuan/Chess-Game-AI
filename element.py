@@ -1,6 +1,6 @@
 import pygame
 
-class Button():
+class Button:
 	def __init__(self, image, pos, text_input, font, base_color, hovering_color):
 		self.image = image
 		self.x_pos = pos[0]
@@ -30,7 +30,7 @@ class Button():
 		else:
 			self.text = self.font.render(self.text_input, True, self.base_color)
 
-class OptionBox():
+class OptionBox:
 
     def __init__(self, x, y, w, h, color, highlight_color, font, option_list, selected = 0):
         self.color = color
