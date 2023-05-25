@@ -20,7 +20,7 @@ A tutorial by Eddie Sharick: [Eddie's YouTube channel](https://www.youtube.com/c
 
 ![Options Screen](https://user-images.githubusercontent.com/80916844/238141619-7dd206b2-d676-42aa-9107-3bb313aeeef9.png)
 
-![Start screen](https://user-images.githubusercontent.com/80916844/240957535-4e884d64-3e1a-43c9-acdb-583373a076ab.png)
+![Start screen](https://user-images.githubusercontent.com/80916844/240962307-30b81771-b203-4189-b2cb-cd5a50625c1a.png)
 
 ## TODO
 - [ ] Cleaning up the code - right now it is really messy.

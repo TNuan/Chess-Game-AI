@@ -11,7 +11,7 @@ MOVE_LOG_PANEL_WIDTH = 480
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT - 200
 DIMENSION = 8
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
-IMAGE_SIZE = SQUARE_SIZE - 20
+IMAGE_SIZE = SQUARE_SIZE - 40
 IMAGES = {} 
 SCREEN = p.display.set_mode((1280, 800))
 p.display.set_caption("Chess game AI")
@@ -229,7 +229,7 @@ def drawPieces(screen, board):
         for column in range(DIMENSION):
             piece = board[row][column]
             if piece != "--":
-                screen.blit(IMAGES[piece], p.Rect(column * SQUARE_SIZE + 10, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                screen.blit(IMAGES[piece], p.Rect(column * SQUARE_SIZE + 20, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
 
 def drawMoveLog(screen, game_state, font):
