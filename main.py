@@ -1,7 +1,7 @@
 import pygame as p, sys
-from element import Button, OptionBox, SliderBar
-import chess.ChessAI as ChessAI
-import chess.ChessEngine as ChessEngine 
+from UI.Element import Button, OptionBox, SliderBar
+import Engine.ChessEngine as ChessEngine
+import AI.ChessAI as ChessAI 
 from multiprocessing import Process, Queue
 
 p.init()
@@ -12,6 +12,7 @@ MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
 IMAGES = {} 
+choosing_options = ['PvP', 'Greedy']
 
 
 #----------------------------------
@@ -31,10 +32,9 @@ def loadImages():
     """
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("./chess/images/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load("./assets/images/pieces/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
 
-
-def play():
+def play(choosing_options):
     clock = p.time.Clock()
     SCREEN.fill("white")
     game_state = ChessEngine.GameState()
@@ -49,8 +49,19 @@ def play():
     move_undone = False
     move_finder_process = None
     move_log_font = p.font.SysFont("Arial", 14, False, False)
-    player_one = True  # if a human is playing white, then this will be True, else False
-    player_two = False  # if a hyman is playing white, then this will be True, else False
+    mode = choosing_options[0]
+    
+    if mode == 'PvP':
+        player_one = True  # if a human is playing white, then this will be True, else False
+        player_two = True  # if a hyman is playing white, then this will be True, else False
+    elif mode == 'PvAI':
+        player_one = True  # if a human is playing white, then this will be True, else False
+        player_two = False  # if a hyman is playing white, then this will be True, else False
+    elif mode == 'AIvAI':
+        player_one = False  # if a human is playing white, then this will be True, else False
+        player_two = False  # if a hyman is playing white, then this will be True, else False
+    
+    algorithm_option = choosing_options[1]
 
     while True:
         clock.tick(60)
@@ -58,10 +69,8 @@ def play():
         PLAY_MOUSE_POS = p.mouse.get_pos()
         PLAY_BACK = Button(image=p.image.load("assets/images/quit_rect.png"), pos=(1040, 700), 
                             text_input="BACK", font=get_font(75), base_color="White", hovering_color="Green")
-        
 
         events = p.event.get()
-
         for e in events:
             if e.type == p.QUIT:
                 p.quit()
@@ -121,7 +130,7 @@ def play():
             if not ai_thinking:
                 ai_thinking = True
                 return_queue = Queue()  # used to pass data between threads
-                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue))
+                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue, algorithm_option))
                 move_finder_process.start()
 
             if not move_finder_process.is_alive():
@@ -291,13 +300,13 @@ def animateMove(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)
     
-def options():
+def options(choosing_options):
     
     mode_options = ["PvP", "PvAI", "AIvAI"]
     mode_box = OptionBox(160, 220, 300, 50, (193, 167, 132), (100, 100, 100), get_font(30), mode_options)
 
-    AI_options = ["Greedy", "Minimax", "Negamax", "Negascout"]
-    ai_box = OptionBox(800, 220, 300, 50, (193, 167, 132), (100, 100, 100), get_font(30), AI_options)
+    ai_options = ["Greedy", "Minimax", "Negamax", "Negascout"]
+    ai_box = OptionBox(800, 220, 300, 50, (193, 167, 132), (100, 100, 100), get_font(30), ai_options)
 
     slider = SliderBar(520, 490, 400, 30, 4, (193, 167, 132), (100, 100, 100), (117, 98, 73))
 
@@ -343,6 +352,9 @@ def options():
         OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
         OPTIONS_BACK.update(SCREEN)
 
+        choosing_options[0] = mode_options[mode_box.get_value()]
+        choosing_options[1] = ai_options[ai_box.get_value()]
+
         for event in events:
             if event.type == p.QUIT:
                 p.quit()
@@ -381,9 +393,9 @@ def main():
                 sys.exit()
             if event.type == p.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play()
+                    play(choosing_options)
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    options()
+                    options(choosing_options)
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     p.quit()
                     sys.exit()

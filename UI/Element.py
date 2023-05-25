@@ -84,6 +84,10 @@ class OptionBox:
                     return self.active_option
         return -1
 
+    def get_value(self):
+        return self.selected
+
+
 class SliderBar:
     def __init__(self, x, y, width, height, steps, bg_color, bar_color, slider_color):
         self.x = x
