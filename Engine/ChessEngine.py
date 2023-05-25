@@ -33,6 +33,7 @@ class GameState:
         self.black_king_location = (0, 4)
         self.checkmate = False
         self.stalemate = False
+        self.checkdraw = False
         self.in_check = False
         self.pins = []
         self.checks = []
@@ -221,7 +222,10 @@ class GameState:
             else:
                 # TODO stalemate on repeated moves
                 self.stalemate = True
+        elif len(self.getAllPieces()) == 2:
+            self.checkdraw = True
         else:
+            self.checkdraw = False
             self.checkmate = False
             self.stalemate = False
 
@@ -306,6 +310,18 @@ class GameState:
                     piece = self.board[row][col][1]
                     self.moveFunctions[piece](row, col, moves)  # calls appropriate move function based on piece type
         return moves
+    
+    def getAllPieces(self):
+        """
+        All pieces without considering checks.
+        """
+        pieces = []
+        for row in range(len(self.board)):
+            for col in range(len(self.board[row])):
+                piece = self.board[row][col]
+                if piece != "--":
+                    pieces.append(piece)
+        return pieces
 
     def checkForPinsAndChecks(self):
         pins = []  # squares pinned and the direction its pinned from

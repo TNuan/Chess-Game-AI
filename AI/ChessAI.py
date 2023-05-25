@@ -10,19 +10,19 @@ from AI.Negascout import findMoveNegascout
 
 from AI.Score import  *
     
-def findBestMove(game_state, valid_moves, return_queue, algorithm_option):
+def findBestMove(game_state, valid_moves, return_queue, algorithm_option, depth):
     global next_move
     next_move = None
     random.shuffle(valid_moves)
     if(algorithm_option == 'Greedy'):
         findMoveGreedy(game_state, valid_moves, 1 if game_state.white_to_move else -1)
     elif (algorithm_option == 'Minimax'):
-        findMoveMinimax(game_state, valid_moves, DEPTH, game_state.white_to_move, -CHECKMATE, CHECKMATE,)  
+        findMoveMinimax(game_state, valid_moves, depth, game_state.white_to_move, -CHECKMATE, CHECKMATE,)  
     elif (algorithm_option == 'Negamax'):
-        findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+        findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, -CHECKMATE, CHECKMATE,
                              1 if game_state.white_to_move else -1)     
     elif (algorithm_option == 'Negascout'):
-        findMoveNegascout(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+        findMoveNegascout(game_state, valid_moves, depth, -CHECKMATE, CHECKMATE,
                              1 if game_state.white_to_move else -1) 
     return_queue.put(next_move)
 
