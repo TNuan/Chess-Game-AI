@@ -8,22 +8,19 @@ p.init()
 
 BOARD_WIDTH = BOARD_HEIGHT = 800
 MOVE_LOG_PANEL_WIDTH = 480
-MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
+MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT - 200
 DIMENSION = 8
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
+IMAGE_SIZE = SQUARE_SIZE - 20
 IMAGES = {} 
-choosing_options = ['PvP', 'Greedy']
-
-
-#----------------------------------
 SCREEN = p.display.set_mode((1280, 800))
 p.display.set_caption("Chess game AI")
 
+choosing_options = ['PvP', 'Greedy', 2]
 BG = p.image.load("assets/images/background.png")
 
 def get_font(size): 
     return p.font.Font("assets/font/font.ttf", size)
-#-----------------------------------
 
 def loadImages():
     """
@@ -32,11 +29,11 @@ def loadImages():
     """
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("./assets/images/pieces/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load("./assets/images/pieces/" + piece + ".png"), (IMAGE_SIZE, SQUARE_SIZE))
 
 def play(choosing_options):
     clock = p.time.Clock()
-    SCREEN.fill("white")
+    SCREEN.blit(p.image.load("assets/images/play_bg.png"), (0, 0))
     game_state = ChessEngine.GameState()
     valid_moves = game_state.getValidMoves()
     move_made = False  # flag variable for when a move is made
@@ -48,8 +45,10 @@ def play(choosing_options):
     ai_thinking = False
     move_undone = False
     move_finder_process = None
-    move_log_font = p.font.SysFont("Arial", 14, False, False)
+    move_log_font = get_font(16)
     mode = choosing_options[0]
+    algorithm_option = choosing_options[1]
+    depth = choosing_options[2]
     
     if mode == 'PvP':
         player_one = True  # if a human is playing white, then this will be True, else False
@@ -61,14 +60,14 @@ def play(choosing_options):
         player_one = False  # if a human is playing white, then this will be True, else False
         player_two = False  # if a hyman is playing white, then this will be True, else False
     
-    algorithm_option = choosing_options[1]
-
     while True:
         clock.tick(60)
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
         PLAY_MOUSE_POS = p.mouse.get_pos()
         PLAY_BACK = Button(image=p.image.load("assets/images/quit_rect.png"), pos=(1040, 700), 
-                            text_input="BACK", font=get_font(75), base_color="White", hovering_color="Green")
+                            text_input="BACK", font=get_font(75), base_color="#FFEDD4", hovering_color="#C1A784")
+        PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+        PLAY_BACK.update(SCREEN)
 
         events = p.event.get()
         for e in events:
@@ -130,7 +129,7 @@ def play(choosing_options):
             if not ai_thinking:
                 ai_thinking = True
                 return_queue = Queue()  # used to pass data between threads
-                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue, algorithm_option))
+                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue, algorithm_option, depth))
                 move_finder_process.start()
 
             if not move_finder_process.is_alive():
@@ -166,7 +165,9 @@ def play(choosing_options):
         elif game_state.stalemate:
             game_over = True
             drawEndGameText(SCREEN, "Stalemate")
-
+        elif game_state.checkdraw:
+            game_over = True
+            drawEndGameText(SCREEN, "Draw")
      
         p.display.flip()
 
@@ -187,7 +188,7 @@ def drawBoard(screen):
     The top left square is always light.
     """
     global colors
-    colors = [p.Color("white"), p.Color("gray")]
+    colors = [p.Color("#f0cfa4"), p.Color("#744d35")]
     for row in range(DIMENSION):
         for column in range(DIMENSION):
             color = colors[((row + column) % 2)]
@@ -202,7 +203,7 @@ def highlightSquares(screen, game_state, valid_moves, square_selected):
         last_move = game_state.move_log[-1]
         s = p.Surface((SQUARE_SIZE, SQUARE_SIZE))
         s.set_alpha(100)
-        s.fill(p.Color('green'))
+        s.fill(p.Color('#80C583'))
         screen.blit(s, (last_move.end_col * SQUARE_SIZE, last_move.end_row * SQUARE_SIZE))
     if square_selected != ():
         row, col = square_selected
@@ -211,10 +212,10 @@ def highlightSquares(screen, game_state, valid_moves, square_selected):
             # highlight selected square
             s = p.Surface((SQUARE_SIZE, SQUARE_SIZE))
             s.set_alpha(100)  # transparency value 0 -> transparent, 255 -> opaque
-            s.fill(p.Color('blue'))
+            s.fill(p.Color('#87CBEA'))
             screen.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
             # highlight moves from that square
-            s.fill(p.Color('yellow'))
+            s.fill(p.Color('#F0E581'))
             for move in valid_moves:
                 if move.start_row == row and move.start_col == col:
                     screen.blit(s, (move.end_col * SQUARE_SIZE, move.end_row * SQUARE_SIZE))
@@ -228,7 +229,7 @@ def drawPieces(screen, board):
         for column in range(DIMENSION):
             piece = board[row][column]
             if piece != "--":
-                screen.blit(IMAGES[piece], p.Rect(column * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                screen.blit(IMAGES[piece], p.Rect(column * SQUARE_SIZE + 10, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
 
 def drawMoveLog(screen, game_state, font):
@@ -237,7 +238,7 @@ def drawMoveLog(screen, game_state, font):
 
     """
     move_log_rect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
-    p.draw.rect(screen, p.Color('black'), move_log_rect)
+    # p.draw.rect(screen, p.Color('black'), move_log_rect)
     move_log = game_state.move_log
     move_texts = []
     for i in range(0, len(move_log), 2):
@@ -256,14 +257,14 @@ def drawMoveLog(screen, game_state, font):
             if i + j < len(move_texts):
                 text += move_texts[i + j]
 
-        text_object = font.render(text, True, p.Color('white'))
+        text_object = font.render(text, True, p.Color('black'))
         text_location = move_log_rect.move(padding, text_y)
         screen.blit(text_object, text_location)
         text_y += text_object.get_height() + line_spacing
 
 
 def drawEndGameText(screen, text):
-    font = p.font.SysFont("Helvetica", 32, True, False)
+    font = p.font.SysFont("Helvetica", 64, True, False)
     text_object = font.render(text, False, p.Color("gray"))
     text_location = p.Rect(0, 0, BOARD_WIDTH, BOARD_HEIGHT).move(BOARD_WIDTH / 2 - text_object.get_width() / 2,
                                                                  BOARD_HEIGHT / 2 - text_object.get_height() / 2)
@@ -341,11 +342,10 @@ def options(choosing_options):
         ai_box.draw(SCREEN)
         slider.draw(SCREEN)
 
-        selected_mode = mode_box.update(events)
-        selected_ai = ai_box.update(events)
+        mode_box.update(events)
+        ai_box.update(events)
         slider.update(OPTIONS_MOUSE_POS)
         
-
         OPTIONS_BACK = Button(image=p.image.load("assets/images/quit_rect.png"), pos=(640, 660), 
                             text_input="BACK", font=get_font(50), base_color="#FFEDD4", hovering_color="#C1A784")
 
@@ -354,6 +354,7 @@ def options(choosing_options):
 
         choosing_options[0] = mode_options[mode_box.get_value()]
         choosing_options[1] = ai_options[ai_box.get_value()]
+        choosing_options[2] = slider.get_value()
 
         for event in events:
             if event.type == p.QUIT:
@@ -362,10 +363,6 @@ def options(choosing_options):
             if event.type == p.MOUSEBUTTONDOWN:
                 if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                     main()
-
-        # If a mode has been selected, print it to the console
-        if selected_mode >= 0:
-            print("Selected mode:", mode_options[selected_mode])
 
         p.display.flip()
 
