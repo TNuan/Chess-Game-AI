@@ -1,4 +1,4 @@
-from AI.Score import  *
+from AI.Score import *
 
 
 def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
@@ -10,11 +10,15 @@ def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multipli
         game_state.makeMove(move)
         next_moves = game_state.getValidMoves()
         if i == 0:
-            score = -findMoveNegascout(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
+            score = -findMoveNegascout(game_state, next_moves,
+                                       depth - 1, -beta, -alpha, -turn_multiplier)
         else:
-            score = -findMoveNegascout(game_state, next_moves, depth - 1, -alpha - 1, -alpha, -turn_multiplier)  # search with a null window
+            score = -findMoveNegascout(game_state, next_moves, depth - 1, -
+                                       alpha - 1, -alpha, -turn_multiplier)  # search with a null window
             if alpha < score < beta:
-                score = -findMoveNegascout(game_state, next_moves, depth - 1, -beta, -score, -turn_multiplier)  # if it failed high, do a full re-search
+                # if it failed high, do a full re-search
+                score = -findMoveNegascout(game_state, next_moves,
+                                           depth - 1, -beta, -score, -turn_multiplier)
         game_state.undoMove()
         if alpha < score:
             best_move = move
@@ -24,6 +28,7 @@ def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multipli
     if depth == DEPTH:
         next_move = best_move
     return alpha
+
 
 def quiescenceSearch(game_state, alpha, beta, turn_multiplier):
     score = turn_multiplier * scoreBoard(game_state)

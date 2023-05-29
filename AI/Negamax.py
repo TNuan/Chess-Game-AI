@@ -1,4 +1,4 @@
-from AI.Score import  *
+from AI.Score import *
 
 
 def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
@@ -10,7 +10,8 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
     for move in valid_moves:
         game_state.makeMove(move)
         next_moves = game_state.getValidMoves()
-        score = -findMoveNegaMaxAlphaBeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
+        score = -findMoveNegaMaxAlphaBeta(game_state, next_moves,
+                                          depth - 1, -beta, -alpha, -turn_multiplier)
         if score > max_score:
             max_score = score
             if depth == DEPTH:
@@ -21,6 +22,7 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
         if alpha >= beta:
             break
     return max_score
+
 
 def quiescenceSearch(game_state, alpha, beta, turn_multiplier):
     score = turn_multiplier * scoreBoard(game_state)
