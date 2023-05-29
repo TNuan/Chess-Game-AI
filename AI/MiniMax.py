@@ -1,4 +1,4 @@
-from AI.Score import  *
+from AI.Score import *
 
 
 def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
@@ -10,7 +10,8 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
         for move in valid_moves:
             game_state.makeMove(move)
             next_moves = game_state.getValidMoves()
-            score = findMoveMinimax(game_state, next_moves, depth - 1, False, alpha, beta)
+            score = findMoveMinimax(
+                game_state, next_moves, depth - 1, False, alpha, beta)
             game_state.undoMove()
             if score > max_score:
                 max_score = score
@@ -25,7 +26,8 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
         for move in valid_moves:
             game_state.makeMove(move)
             next_moves = game_state.getValidMoves()
-            score = findMoveMinimax(game_state, next_moves, depth - 1, True, alpha, beta)
+            score = findMoveMinimax(
+                game_state, next_moves, depth - 1, True, alpha, beta)
             game_state.undoMove()
             if score < min_score:
                 min_score = score
@@ -35,6 +37,7 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
             if alpha >= beta:
                 break
         return min_score
+
 
 def quiescenceSearch(game_state, alpha, beta, white_to_move):
     best_score = scoreBoard(game_state)

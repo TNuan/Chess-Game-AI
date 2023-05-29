@@ -18,7 +18,7 @@ class Move:
         self.piece_captured = board[self.end_row][self.end_col]
         # pawn promotion
         self.is_pawn_promotion = (self.piece_moved == "wp" and self.end_row == 0) or (
-                self.piece_moved == "bp" and self.end_row == 7)
+            self.piece_moved == "bp" and self.end_row == 7)
         # en passant
         self.is_enpassant_move = is_enpassant_move
         if self.is_enpassant_move:
@@ -27,7 +27,8 @@ class Move:
         self.is_castle_move = is_castle_move
 
         self.is_capture = self.piece_captured != "--"
-        self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_row * 10 + self.end_col
+        self.moveID = self.start_row * 1000 + self.start_col * \
+            100 + self.end_row * 10 + self.end_col
 
     def __eq__(self, other):
         """

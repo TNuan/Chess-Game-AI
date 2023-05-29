@@ -59,6 +59,7 @@ CHECKMATE = 1000
 STALEMATE = 0
 DEPTH = 2
 
+
 def scoreBoard(game_state):
     """
     Score the board. A positive score is good for white, a negative score is good for black.
@@ -70,7 +71,7 @@ def scoreBoard(game_state):
             return CHECKMATE  # white wins
     elif game_state.stalemate:
         return STALEMATE
-    
+
     pieces = []
     score = 0
     for row in range(len(game_state.board)):
