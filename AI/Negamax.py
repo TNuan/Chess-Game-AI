@@ -17,8 +17,9 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
             if depth == DEPTH:
                 next_move = move
         game_state.undoMove()
-        if max_score > alpha:
-            alpha = max_score
+        alpha = max(alpha, max_score)
+        # if max_score > alpha:
+        #     alpha = max_score
         if alpha >= beta:
             break
     return max_score

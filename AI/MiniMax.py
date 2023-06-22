@@ -6,7 +6,7 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
     if depth == 0:
         return quiescenceSearch(game_state, alpha, beta, white_to_move)
     if white_to_move:
-        max_score = CHECKMATE
+        max_score = -CHECKMATE
         for move in valid_moves:
             game_state.makeMove(move)
             next_moves = game_state.getValidMoves()
