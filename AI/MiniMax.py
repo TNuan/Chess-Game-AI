@@ -1,13 +1,16 @@
 from AI.Score import *
 
+count = 0
 
 def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
+    global count
     global next_move
     if depth == 0:
         return quiescenceSearch(game_state, alpha, beta, white_to_move)
     if white_to_move:
-        max_score = CHECKMATE
+        max_score = -CHECKMATE
         for move in valid_moves:
+            count += 1
             game_state.makeMove(move)
             next_moves = game_state.getValidMoves()
             score = findMoveMinimax(
@@ -24,6 +27,7 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
     else:
         min_score = CHECKMATE
         for move in valid_moves:
+            count += 1
             game_state.makeMove(move)
             next_moves = game_state.getValidMoves()
             score = findMoveMinimax(
@@ -40,10 +44,12 @@ def findMoveMinimax(game_state, valid_moves, depth, white_to_move, alpha, beta):
 
 
 def quiescenceSearch(game_state, alpha, beta, white_to_move):
+    global count
     best_score = scoreBoard(game_state)
     if white_to_move:
         captures = game_state.getAllPossibleAttacks()
         for move in captures:
+            count += 1
             game_state.makeMove(move)
             score = quiescenceSearch(game_state, alpha, beta, False)
             game_state.undoMove()
@@ -54,6 +60,7 @@ def quiescenceSearch(game_state, alpha, beta, white_to_move):
     else:
         captures = game_state.getAllPossibleAttacks()
         for move in captures:
+            count += 1
             game_state.makeMove(move)
             score = quiescenceSearch(game_state, alpha, beta, True)
             game_state.undoMove()
@@ -62,3 +69,7 @@ def quiescenceSearch(game_state, alpha, beta, white_to_move):
             if alpha >= beta:
                 break
     return best_score
+
+def getCount():
+    global count
+    return count

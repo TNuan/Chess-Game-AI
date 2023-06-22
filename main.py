@@ -6,6 +6,9 @@ import Engine.ChessEngine as ChessEngine
 import AI.ChessAI as ChessAI
 from multiprocessing import Process, Queue
 
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 SCREEN = p.display.set_mode((1280, 800))
 BG = p.image.load("assets/images/background.png")
 FPS = 60

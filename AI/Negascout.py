@@ -1,12 +1,14 @@
 from AI.Score import *
-
+count = 0
 
 def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+    global count
     global next_move
     best_move = None
     if depth == 0:
         return quiescenceSearch(game_state, alpha, beta, turn_multiplier)
     for i, move in enumerate(valid_moves):
+        count += 1
         game_state.makeMove(move)
         next_moves = game_state.getValidMoves()
         if i == 0:
@@ -31,6 +33,7 @@ def findMoveNegascout(game_state, valid_moves, depth, alpha, beta, turn_multipli
 
 
 def quiescenceSearch(game_state, alpha, beta, turn_multiplier):
+    global count
     score = turn_multiplier * scoreBoard(game_state)
     if score >= beta:
         return beta
@@ -38,6 +41,7 @@ def quiescenceSearch(game_state, alpha, beta, turn_multiplier):
         alpha = score
     capture_moves = game_state.getAllPossibleAttacks()
     for move in capture_moves:
+        count += 1
         if beta <= alpha:
             break
         game_state.makeMove(move)
@@ -48,3 +52,7 @@ def quiescenceSearch(game_state, alpha, beta, turn_multiplier):
         if score > alpha:
             alpha = score
     return alpha
+
+def getCount():
+    global count
+    return count

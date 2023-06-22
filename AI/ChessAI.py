@@ -2,6 +2,8 @@
 Handling the AI moves.
 """
 import random
+import pandas as pd
+import csv 
 
 from AI.Greedy import findMoveGreedy
 from AI.MiniMax import findMoveMinimax
@@ -10,6 +12,10 @@ from AI.Negascout import findMoveNegascout
 
 from AI.Score import *
 
+from AI.Negamax import getCount
+# from AI.MiniMax import getCount
+# from AI.Negascout import getCount
+# from AI.Greedy import getCount
 
 def findBestMove(game_state, valid_moves, return_queue, algorithm_option, depth):
     global next_move
@@ -27,6 +33,7 @@ def findBestMove(game_state, valid_moves, return_queue, algorithm_option, depth)
     elif (algorithm_option == 'Negascout'):
         findMoveNegascout(game_state, valid_moves, depth, -CHECKMATE, CHECKMATE,
                           1 if game_state.white_to_move else -1)
+    print(getCount()) 
     return_queue.put(next_move)
 
 
